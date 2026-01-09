@@ -24,6 +24,7 @@ lucky enough a lexicographically ordered name?
 
 That's actually not possible to do in a reasonable manner without this plugin.
 
+
 ## Usage
 
 First install the plugin:
@@ -42,6 +43,12 @@ And then `bundle install` and  run your tests as usual. Any gem that requires `p
 will be transparently rewritten to depend on `openvox` instead. Now your tests will
 actually test what you expect them to be testing.
 
+### Alias specification
+
+The specification for aliases is a comma separated list of colon separated aliases.
+This means `"source:target,source2:target2,source3:target3"` and so on.
+
+
 ### Global installation
 
 If you so choose, you can install and configure the plugin globally so that all
@@ -59,7 +66,7 @@ $ bundle config set --global aliases 'puppet:openvox'
 This alias is not smart. It doesn't know anything about version numbers, or breaking
 changes or really anything except the name of gems. This means that when there are
 actual major breaking changes, this trivial rewriting of gem names will not be
-sufficient and written for one gem code will break on the other. In the case of
-*testing*n that is acceptable because it means that tests break and surface the
+sufficient and code written for one gem will break on the other. In the case of
+*testing* that is acceptable because it means that tests break and surface the
 need for code updates. But if you're using this to band-aid over dependencies in
 production, be aware that it's a very thin and fragile veneer.

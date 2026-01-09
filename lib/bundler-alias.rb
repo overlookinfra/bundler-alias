@@ -11,7 +11,7 @@ module Bundler
         return if defined?(@registered) && @registered
         @registered = true
 
-        @aliases = Hash[Bundlerbut .settings[:aliases].split(',').map {|i| i.split ':' } ]
+        @aliases = Hash[Bundler.settings[:aliases].split(',').map {|i| i.split ':' } ]
 
         Bundler::Plugin.add_hook('before-install-all') do |_d|
           require "bundler/alias/dependency_patch"
