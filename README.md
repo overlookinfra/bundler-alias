@@ -1,0 +1,65 @@
+# Bundler Alias
+
+This [bundler plugin](https://bundler.io/guides/bundler_plugins.html) allows you
+to select between multiple more or less equivalent gem implementations without
+requiring upstream accommodations. This is useful, for example, when a defunct
+project is forked to keep it alive, but the ecosystem hasn't caught up and
+updated all the dependencies yet.
+
+## Use Case
+
+This was initially developed to aid in testing Puppet modules after the
+[OSS Puppet rug pull](https://overlookinfratech.com/2024/11/08/sequestered-source/).
+The testing framework is all Ruby based, so the first step in testing any Puppet
+module is, you guessed it, `bundle install`.
+
+Updating your own `Gemfile` is pretty straightforward. And when using ModuleSync
+it's not too difficult to [push that change out to all your modules](https://github.com/voxpupuli/modulesync_config/commit/bcae6e8382f121ea4d1146901051cb9cce7f11ae).
+
+But what about when you depend on a gem like `puppet-strings` that has a transitive
+dependency on `puppet`? You'll end up with both `openvox` and `puppet` installed.
+In this particular case, it's (probably) ok because glob order finds `openvox` first.
+But what if you want to test your module against both implementations or you're not
+lucky enough a lexicographically ordered name?
+
+That's actually not possible to do in a reasonable manner without this plugin.
+
+## Usage
+
+First install the plugin:
+
+```
+$ bundle plugin install "bundler-alias"
+```
+
+Then configure your alias(es):
+
+```
+$ bundle config set aliases 'puppet:openvox'
+```
+
+And then `bundle install` and  run your tests as usual. Any gem that requires `puppet`
+will be transparently rewritten to depend on `openvox` instead. Now your tests will
+actually test what you expect them to be testing.
+
+### Global installation
+
+If you so choose, you can install and configure the plugin globally so that all
+projects will rewrite dependencies transparently. Be forewarned that this will
+affect every `bundle install` command you run.
+
+```
+$ cd ~ # ensure you're in your home directory
+$ bundle plugin install "bundler-alias"
+$ bundle config set --global aliases 'puppet:openvox'
+```
+
+## Limitations
+
+This alias is not smart. It doesn't know anything about version numbers, or breaking
+changes or really anything except the name of gems. This means that when there are
+actual major breaking changes, this trivial rewriting of gem names will not be
+sufficient and written for one gem code will break on the other. In the case of
+*testing*n that is acceptable because it means that tests break and surface the
+need for code updates. But if you're using this to band-aid over dependencies in
+production, be aware that it's a very thin and fragile veneer.
