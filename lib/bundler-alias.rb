@@ -17,7 +17,7 @@ module Bundler
           deps.each do |d|
             next unless Bundler::Alias.aliases.include? d.name
 
-            puts "Gemfile declared #{d.name}, but it has been aliased to #{Bundler::Alias.aliases[d.name]}."
+            warn "Gemfile declared #{d.name}, but it has been aliased to #{Bundler::Alias.aliases[d.name]}."
             d.name = Bundler::Alias.aliases[d.name]
           end
         end
