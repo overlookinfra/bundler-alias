@@ -36,11 +36,13 @@ module Bundler
         # this hook is added by https://github.com/ruby/rubygems/pull/6961
         # Because it's invoked directly after the Gemfile is evaluated, we can munge dependencies
         # before anything else operates on it.
-        Bundler::Plugin.add_hook('after-eval') do |definition|
-          definition.dependencies.each do |d|
-            next unless Bundler::Alias.aliases.include? d.name
-            warn "Gemfile declared #{d.name}, but it has been aliased to #{Bundler::Alias.aliases[d.name]}."
-            d.name = Bundler::Alias.aliases[d.name]
+        if Bundler::Plugin::Events.defined_event? 'after-eval'
+          Bundler::Plugin.add_hook('after-eval') do |definition|
+            definition.dependencies.each do |d|
+              next unless Bundler::Alias.aliases.include? d.name
+              warn "Gemfile declared #{d.name}, but it has been aliased to #{Bundler::Alias.aliases[d.name]}."
+              d.name = Bundler::Alias.aliases[d.name]
+            end
           end
         end
 
